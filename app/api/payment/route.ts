@@ -68,22 +68,36 @@ export async function POST(req: NextRequest) {
 
 
     // ---------------- INITIATE PAYMENT ----------------
-    const { userId, items, cartId, deliveryFee = 0 } = body;
+    const { userId, items, cartId, deliveryFee = 0, name, contact } = body;
 
     if (!userId || !items?.length) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    // Validate that user has contact field filled
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    let user;
+    if (userId === "nil" || userId === "guest") {
+      user = await prisma.user.findUnique({ where: { email: "guest@loysfoods.com" } });
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            name: "Guest Customer",
+            email: "guest@loysfoods.com",
+            contact: "Guest",
+            role: "customer",
+          },
+        });
+      }
+    } else {
+      user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
 
-    if (!user.contact || user.contact === "xxxx-xxx-xxxx") {
-      return NextResponse.json({
-        error: "Please update your contact information before checkout. Go to your account settings to add your phone number."
-      }, { status: 400 });
+      if (!user.contact || user.contact === "xxxx-xxx-xxxx") {
+        return NextResponse.json({
+          error: "Please update your contact information before checkout. Go to your account settings to add your phone number."
+        }, { status: 400 });
+      }
     }
 
     // Calculate subtotal server-side
@@ -100,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     let cart;
     if (cartId) {
-      const existingCart = await prisma.cart.findFirst({ where: { id: cartId, userId, status: "pending" } });
+      const existingCart = await prisma.cart.findFirst({ where: { id: cartId, userId: user.id, status: "pending" } });
       if (!existingCart) return NextResponse.json({ error: "Cart not found or already processed" }, { status: 404 });
 
       await prisma.cartItem.deleteMany({ where: { cartId } });
@@ -110,16 +124,20 @@ export async function POST(req: NextRequest) {
         data: {
           total,
           deliveryFee: Number(deliveryFee),
+          name: name || undefined,
+          contact: contact || undefined,
           products: { create: items.map((i: any) => ({ productId: i.productId, quantity: i.quantity })) },
         },
       });
     } else {
       cart = await prisma.cart.create({
         data: {
-          userId,
+          userId: user.id,
           total,
           deliveryFee: Number(deliveryFee),
           status: "pending",
+          name: name || "Guest Customer",
+          contact: contact || "Guest Contact",
           products: { create: items.map((i: any) => ({ productId: i.productId, quantity: i.quantity })) },
         },
       });
@@ -128,7 +146,7 @@ export async function POST(req: NextRequest) {
     // Create payment record
     const tx_ref = generateTxRef();
     await prisma.payment.create({
-      data: { cartId: cart.id, tx_ref, method: "flutterwave", amount: total },
+      data: { cartId: cart.id, tx_ref, method: "bank_transfer", amount: total },
     });
 
     return NextResponse.json({ cartId: cart.id, tx_ref, amount: total, currency: "NGN" });

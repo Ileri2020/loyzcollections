@@ -85,6 +85,14 @@ export function CartClient({ className }: CartProps) {
   const { items, removeItem, clearCart, subtotal, updateQuantity, itemCount, setCheckoutData, checkoutData, clearCheckoutData } = useCart();
   const { user } = useAppContext();
 
+  // Guest details state
+  const [guestName, setGuestName] = React.useState("");
+  const [guestPhone, setGuestPhone] = React.useState("");
+  const [guestEmail, setGuestEmail] = React.useState("");
+  const [guestState, setGuestState] = React.useState("Lagos");
+  const [guestCity, setGuestCity] = React.useState("");
+  const [guestAddress, setGuestAddress] = React.useState("");
+
   const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(
     user?.addresses?.[0]?.id ?? null
   );
@@ -107,45 +115,26 @@ export function CartClient({ className }: CartProps) {
 
   React.useEffect(() => {
     const fetchDeliveryFee = async () => {
-      if (!selectedAddress) {
+      if (!selectedAddress && user?.id !== 'nil') {
         setDbDeliveryFee(0);
         return;
       }
 
       setLoadingFee(true);
       try {
-        // Fetch all fees - optimization: could filter server side but fetching all is fine for small scale
         const res = await axios.get('/api/dbhandler?model=deliveryFee');
         const fees: any[] = res.data;
 
         if (!Array.isArray(fees)) return;
 
-        const { country, state, city } = selectedAddress;
+        const country = user?.id !== 'nil' ? selectedAddress?.country : "Nigeria";
+        const state = user?.id !== 'nil' ? selectedAddress?.state : guestState;
+        const city = user?.id !== 'nil' ? selectedAddress?.city : guestCity;
 
-        // Normalize state similarly to before if needed, but assuming DB matches address input
-        // Since we formerly normalized "Lagos State" to "Lagos", we might need to handle that.
-        // For now, simple matching. The AddressPriceForm allows selecting exact states.
-
-        // Priority: 
-        // 1. Country + State + City
-        // 2. Country + State
-        // 3. Country only
-
-        const normalizedState = normalizeState(state); // Reuse helper if state names vary
-        // However, if we are using the Country-State-City library in Admin, 
-        // we should ensure the user's address state matches that format or we normalize it.
-        // The previous normalizeState removed "State" and underscores. 
-        // Let's rely on flexible matching or normalized check. 
-
-        // Let's stick closer to the user's previous hardcoded keys, which were like "Lagos", "Kwara".
-        // If the DB has "Lagos State" (from library), we might miss it.
-        // I'll try to match loosely.
-
-        // Actually, the user asked to migrate the hardcoded values. 
-        // So the DB will contain "Lagos", "Kwara" etc. (as state names).
+        const normalizedState = normalizeState(state);
 
         const match = fees.find(f =>
-          f.country === (country || 'Nigeria') && // Defaulting to Nigeria if missing for now
+          f.country === (country || 'Nigeria') &&
           f.state === normalizedState &&
           f.city === city
         ) || fees.find(f =>
@@ -167,21 +156,26 @@ export function CartClient({ className }: CartProps) {
     };
 
     fetchDeliveryFee();
-  }, [selectedAddress]);
-
-
+  }, [selectedAddress, user?.id, guestState, guestCity]);
 
   const deliveryFee = items.length > 0 ? dbDeliveryFee : 0;
   const totalAmount = Number(subtotal || 0) + Number(deliveryFee || 0);
 
   /* CHECKOUT */
   const prepareCheckout = async () => {
-    if (!user?.id || !selectedAddressId || items.length === 0) return;
+    if (items.length === 0) return;
 
-    // Check if user has contact filled
-    if (!user?.contact || user.contact === "xxxx-xxx-xxxx") {
-      alert("Please update your contact information before checkout. Go to your account settings to add your phone number.");
-      return null;
+    if (user?.id === 'nil') {
+      if (!guestName || !guestPhone || !guestAddress || !guestCity || !guestState) {
+        alert("Please fill in all address and contact details.");
+        return null;
+      }
+    } else {
+      if (!selectedAddressId) return;
+      if (!user?.contact || user.contact === "xxxx-xxx-xxxx") {
+        alert("Please update your contact information before checkout. Go to your account settings to add your phone number.");
+        return null;
+      }
     }
 
     try {
@@ -193,7 +187,9 @@ export function CartClient({ className }: CartProps) {
         })),
         deliveryFee,
         total: totalAmount,
-        deliveryAddressId: selectedAddressId,
+        deliveryAddressId: user?.id !== 'nil' ? selectedAddressId : undefined,
+        name: user?.id !== 'nil' ? undefined : guestName,
+        contact: user?.id !== 'nil' ? undefined : `${guestPhone} | Email: ${guestEmail || 'none'} | Address: ${guestAddress}, ${guestCity}, ${guestState}`,
         ...(checkoutData?.cartId ? { cartId: checkoutData.cartId } : {}),
       };
 
@@ -206,24 +202,6 @@ export function CartClient({ className }: CartProps) {
       alert(errorMessage);
       return null;
     }
-  };
-
-  // Wrapper for manual transfer that ensures cart exists first
-  const handleBankTransferClick = async () => {
-    // Logic: we need a cart ID to link the transfer to. 
-    // Reuse prepareCheckout to generate the cart in DB.
-    // If checkoutData already exists, use it.
-
-    let cartId = checkoutData?.cartId;
-
-    if (!cartId) {
-      const data = await prepareCheckout();
-      if (data && data.cartId) {
-        cartId = data.cartId;
-      }
-    }
-
-    return cartId; // Return to BankTransferForm if we could render it conditionally or pass it
   };
 
   /* CART TRIGGER */
@@ -359,14 +337,68 @@ export function CartClient({ className }: CartProps) {
               )}
             </div>
           ) : (
-            <div className="w-full flex flex-col justify-center items-center space-y-4">
-              <p className="font-medium text-red-500 text-center">
-                Please log in to proceed with checkout.
-              </p>
-              <div className="flex flex-row gap-5">
+            <div className="space-y-3 bg-secondary/10 p-3 rounded-lg border border-border">
+              <h4 className="text-sm font-semibold">Delivery & Contact Details (Guest)</h4>
+              
+              {/* Optional Login/Signup buttons (commented out as per user request to comment out compulsory login/signup buttons) */}
+              {/*
+              <div className="flex flex-row gap-5 mb-2 justify-center">
                 <Login />
                 <Signup />
               </div>
+              */}
+
+              <input
+                type="text"
+                placeholder="Your Full Name"
+                className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Phone Number"
+                className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                value={guestPhone}
+                onChange={(e) => setGuestPhone(e.target.value)}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email Address (optional)"
+                className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                  value={guestState}
+                  onChange={(e) => setGuestState(e.target.value)}
+                >
+                  {Object.keys(DELIVERY_FEES_BY_STATE).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                  <option value="FCT">FCT</option>
+                  <option value="Plateau">Plateau</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="City"
+                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                  value={guestCity}
+                  onChange={(e) => setGuestCity(e.target.value)}
+                  required
+                />
+              </div>
+              <textarea
+                placeholder="Street Address"
+                className="w-full rounded-md border bg-background px-3 py-1.5 text-sm h-16 resize-none"
+                value={guestAddress}
+                onChange={(e) => setGuestAddress(e.target.value)}
+                required
+              />
             </div>
           )}
 
@@ -389,27 +421,27 @@ export function CartClient({ className }: CartProps) {
           </div>
 
           {/* CHECKOUT BUTTONS */}
-          {user.id !== 'nil' ? (
-            <div className="space-y-3">
-              {/* 
-                   Logic: 
-                   1. User clicks "Checkout" -> creates cart in DB -> shows Payment Options.
-                   OR
-                   2. We show payment options directly if 'checkoutData' exists.
-                 */}
+          <div className="space-y-3">
+            {/* 
+                 Logic: 
+                 1. User clicks "Checkout" -> creates cart in DB -> shows Payment Options.
+                 OR
+                 2. We show payment options directly if 'checkoutData' exists.
+               */}
 
-              {!checkoutData ? (
-                <Button
-                  disabled={
-                    user?.id === 'nil' || !selectedAddressId || (user?.addresses?.length === 0)
-                  }
-                  onClick={prepareCheckout}
-                  className="w-full"
-                >
-                  Proceed to Checkout
-                </Button>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
+            {!checkoutData ? (
+              <Button
+                disabled={
+                  user?.id !== 'nil' && (!selectedAddressId || (user?.addresses?.length === 0))
+                }
+                onClick={prepareCheckout}
+                className="w-full"
+              >
+                Proceed to Checkout
+              </Button>
+            ) : (
+              <div className={cn("grid gap-2", user?.id !== 'nil' ? "grid-cols-2" : "grid-cols-1")}>
+                {user?.id !== 'nil' && (
                   <FlutterWaveButtonHook
                     tx_ref={checkoutData.tx_ref}
                     amount={totalAmount}
@@ -424,21 +456,30 @@ export function CartClient({ className }: CartProps) {
                       setIsOpen(false);
                     }}
                   />
+                )}
 
-                  {/* Manual Transfer - Need to pass cartID */}
-                  <BankTransferForm
-                    amount={totalAmount}
-                    cartId={checkoutData.cartId}
-                    onSuccess={() => {
-                      clearCart();
-                      clearCheckoutData();
-                      setIsOpen(false);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          ) : null}
+                {/* Manual Transfer - Need to pass cartID */}
+                <BankTransferForm
+                  amount={totalAmount}
+                  cartId={checkoutData.cartId}
+                  onSuccess={() => {
+                    clearCart();
+                    clearCheckoutData();
+                    setIsOpen(false);
+                  }}
+                  guestDetails={user?.id === 'nil' ? {
+                    name: guestName,
+                    phone: guestPhone,
+                    email: guestEmail,
+                    address: guestAddress,
+                    city: guestCity,
+                    state: guestState,
+                    items: items
+                  } : undefined}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 

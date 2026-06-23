@@ -21,11 +21,20 @@ import { toast } from "sonner"; // Assuming sonner is used, or fallback to alert
 
 interface BankTransferFormProps {
     amount: number;
-    cartId?: string; // Optional, might be paying for a new cart (no ID yet) or existing
+    cartId?: string;
     onSuccess: () => void;
+    guestDetails?: {
+        name: string;
+        phone: string;
+        email: string;
+        address: string;
+        city: string;
+        state: string;
+        items: any[];
+    };
 }
 
-export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferFormProps) {
+export function BankTransferForm({ amount, cartId, onSuccess, guestDetails }: BankTransferFormProps) {
     const { user, openDialog } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -33,7 +42,6 @@ export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferForm
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
-    // Bank Details (Hardcoded for now as per common practice, or fetch from env/config)
     const BANK_DETAILS = {
         bankName: process.env.NEXT_PUBLIC_BANK_NAME,
         accountNumber: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER,
@@ -51,7 +59,6 @@ export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferForm
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!payeeName) {
-            // alert("Please enter the account name used for the transfer.");
             openDialog("Please enter the account name used for the transfer.", "Missing Info");
             return;
         }
@@ -60,7 +67,6 @@ export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferForm
         try {
             let receiptUrl = "";
 
-            // 1. Upload Receipt if provided
             if (file) {
                 const formData = new FormData();
                 formData.append("file", file);
@@ -69,22 +75,11 @@ export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferForm
                 formData.append("title", `Receipt for Cart ${cartId || "New"}`);
                 formData.append("for", "payment_receipt");
 
-                // Reusing the file upload API endpoint structure seen in fileupload.tsx
                 const uploadRes = await axios.post("/api/file/image", formData);
                 if (uploadRes.status === 200) {
                     receiptUrl = uploadRes.data.url;
                 }
             }
-
-            // 2. Submit Payment/Update Cart
-            // If we have a cartId, we update it. If it's a new checkout (from CartClient), 
-            // the parent logic usually handles creation, but for manual transfer 
-            // we might need to create the order first if it doesn't exist?
-            // For this component, we assume the cart exists OR the parent handles the 'confirm' logic.
-            // However, for manual transfer, we typically need to record this *on* the cart.
-
-            // Pattern: Parent passes logic or we call generic update.
-            // Based on request: "let the cart status be 'unconfirmed'"
 
             if (cartId) {
                 await axios.put(`/api/dbhandler?model=cart&id=${cartId}`, {
@@ -97,33 +92,26 @@ export function BankTransferForm({ amount, cartId, onSuccess }: BankTransferForm
                     },
                 });
 
-                // Attempt to create a payment record for tracking
                 try {
-                    try {
-                        await axios.post("/api/send-notification", {
-                            // email: process.env.NEXT_PUBLIC_ORDER_RECEIVER_EMAIL,
-                            orderDetails: { tx_ref: 'bank_transfer', amount },
-                        });
-                        await axios.post("/api/send-notification", {
-                            // email: 'adepojuololade2020@gmail.com',
-                            orderDetails: { tx_ref: 'bank_transfer', amount },
-                        });
-                    } catch (emailError) {
-                        console.warn("Failed to send email notifications:", emailError);
-                    }
-                } catch (err) {
-                    console.warn("Could not create payment record, but cart updated.", err);
+                    await axios.post("/api/send-notification", {
+                        orderDetails: {
+                            tx_ref: `bank_transfer_${cartId}`,
+                            amount,
+                            payeeName,
+                            guestDetails: guestDetails || null
+                        },
+                    });
+                } catch (emailError) {
+                    console.warn("Failed to send email notifications:", emailError);
                 }
             }
 
             setIsOpen(false);
             onSuccess();
-            // alert("Transfer submitted! Your order is pending confirmation.");
             openDialog("Transfer submitted! Your order is pending confirmation.", "Submission Successful");
 
         } catch (error) {
             console.error("Transfer submission failed:", error);
-            // alert("Failed to submit transfer details. Please try again.");
             openDialog("Failed to submit transfer details. Please try again.", "Submission Error");
         } finally {
             setLoading(false);

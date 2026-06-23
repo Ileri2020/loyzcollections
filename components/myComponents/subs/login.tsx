@@ -366,11 +366,12 @@ const Login = () => {
               </form>
               <form action={facebookSignIn}>
                 <Button
-                  className="border-2 border-sky-600 relative w-full max-w-[300px] mx-auto flex items-center justify-center bg-sky-600 text-white rounded-md h-10 font-medium shadow-input hover:bg-sky-700 transition-colors"
+                  className="border-2 border-primary relative w-full max-w-[300px] mx-auto flex items-center justify-center text-black rounded-md h-10 font-medium shadow-input hover:bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                   type="submit"
+                  variant='outline'
                 >
-                  <FaFacebook className="h-4 w-4" />
-                  <span className="text-sm ml-2">
+                  <FaFacebook className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+                  <span className="text-neutral-700 dark:text-neutral-300 text-sm">
                     Facebook
                   </span>
                 </Button>
