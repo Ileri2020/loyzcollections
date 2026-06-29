@@ -6,22 +6,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: "./",
   },
-
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: '.*\\.vercel\\.app',
-          },
-        ],
-        destination: 'https://www.loyzfoodsandspices.com/:path*',
-        permanent: true,
-      },
-    ]
-  },
 };
 
 export default nextConfig;
