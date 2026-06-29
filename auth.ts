@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -11,7 +11,6 @@ const prisma = new PrismaClient();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       name: "Credentials",
@@ -36,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!user || !user.password) throw new Error("Invalid email/contact or password");
 
-        const isMatched = await bcrypt.compare(password, user.password);
+        const isMatched = await bcrypt.compare(password as string, user.password);
         if (!isMatched) throw new Error("Invalid email/contact or password");
 
         return {
