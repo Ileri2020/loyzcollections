@@ -95,12 +95,11 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
   const DynamicText = () => (
     <RiseAndFadeText
       texts={[
-        "From Loyz Foods and Spices", "Card & Bank Transfer Payments", "Login With Google or Facebook",
-        "Naturally Processed Spices", "Quality You Can Trust", "Trusted by Homes and Businesses",
+        "From Loyz Collections", "Card & Bank Transfer Payments", "Login With Google or Facebook",
+        "Trendy Styles for Every You", "Quality You Can Trust", "Trusted by Homes and Businesses",
         "Fast & Reliable Delivery", "Carefully Packed for Freshness", "Customer Satisfaction Guaranteed",
-        "Premium Products, Fair Prices", "Authentic Nigerian Spice Blends", "Locally Sourced, Globally Delivered",
-        "Traditional Taste, Modern Quality", "Export-Standard Food Products", "Crafted for Every Kitchen",
-        "Pure. Natural. Flavorful.", "Freshness in Every Pack", "Spices That Elevate Your Meals",
+        "Premium Products, Fair Prices", "Locally Sourced, Globally Delivered",
+        "Modern Quality",
         "Taste You Can Trust", "Quality Without Compromise",
       ]}
       className="text-xl md:text-2xl mt-2 font-semibold text-muted-foreground overflow-hidden"
@@ -154,19 +153,27 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
         <BackgroundEffects />
         <div className="relative z-10 container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex flex-col justify-center space-y-8">
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex flex-col justify-center space-y-3 md:space-y-8">
               <div className="flex z-50 md:hidden w-full justify-center items-center"><SearchInput /></div>
-              <div className="space-y-4">
+              
+              <div className="md:space-y-4 space-y-1">
                 <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-accent/10 text-accent hover:bg-accent/20">
-                  <Star className="mr-1 h-3 w-3 fill-accent" /> #1 Choice for Spices
+                  <Star className="mr-1 h-3 w-3 fill-accent" /> #1st Choice
                 </div>
-                <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                  <span className="block text-foreground">Your One-Stop Shop for</span>
-                  <span className="block text-accent">Food and Spice Blends</span>
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative /block lg:hidden h-[300px] -z-10 w-full">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-[400px] h-[400px] bg-accent/10 rounded-full animate-blob mix-blend-multiply filter blur-xl opacity-70"></div>
+                    <div className="relative w-[400px] h-[400px] bg-primary/10 rounded-full animate-blob animation-delay-2000 mix-blend-multiply filter blur-xl opacity-70 -ml-20"></div>
+                    <img src="/mission-burrito-fast-food-shawarma-kati-roll-breakfast-6dd86711999109a88eae948201cd24bf.png" alt="Delicious Food" className="relative z-10 w-[450px] h-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500" />
+                  </div>
+                </motion.div>
+                <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mt-4">
+                  <span className="block text-foreground">Affordable Quality Made For You</span>
+                  <span className="block text-accent text-2xl md:text-3xl">STYLE . QUALITY . AFFORDABLE</span>
                 </h1>
                 <DynamicText />
                 <p className="max-w-[600px] text-lg text-muted-foreground md:text-xl leading-relaxed">
-                  Discover premium products at competitive prices, with fast shipping and exceptional customer service.
+                  LOOK GOOD. FEEL CONFIDENT. LIVE LOYZ.
                 </p>
               </div>
               <CTAButtons />
@@ -197,7 +204,7 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="backdrop-blur-md bg-black/30 p-8 md:p-10 rounded-2xl border border-white/10 shadow-2xl">
               <div className="flex z-50 md:hidden w-full justify-center items-center mb-6"><SearchInput /></div>
               <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-4 drop-shadow-md">
-                Your One-Stop Shop for <br /><span className="text-accent">Food and Spice Blends</span>
+                Affordable Quality <br /><span className="text-accent">Made For You</span>
               </h1>
               <div className="text-gray-200 mb-8"><DynamicText /></div>
               <CTAButtons />

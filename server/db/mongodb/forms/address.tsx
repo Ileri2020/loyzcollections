@@ -96,7 +96,7 @@ const AddressForm = (props: {method : string,}) => {
         <DrawerContent className='flex flex-col justify-center items-center py-5 /bg-red-500 max-w-5xl mx-auto'>
           <form ref={form  as RefObject<HTMLFormElement>} onSubmit={addProduct} className="flex flex-col gap-4 p-5 my-1 bg-secondary rounded-xl max-w-xl">
           <DrawerHeader>
-            <DrawerTitle className="text-xl /text-accent mb-2 text-center font-semibold">{props.method} User from <span className='text-accent'>Loyz Foods and Spices</span></DrawerTitle>
+            <DrawerTitle className="text-xl /text-accent mb-2 text-center font-semibold">{props.method} User from <span className='text-accent'>Loyz Collections</span></DrawerTitle>
             <DrawerDescription></DrawerDescription>
           </DrawerHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

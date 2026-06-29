@@ -57,7 +57,7 @@ const Navbar = (): JSX.Element => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href={"/"} className="flex dark:hidden flex-1 md:flex-none h-full max-h-[200px] md:max-h-[50px] /bg-red-500 overflow-clip justify-center items-center">
-                  <Image src={loyzspiceslogo} alt="Home" className="h-[140%]" />
+                  <Image src={loyzspiceslogo} alt="Home" className="h-[50%] w-[35%] md:h-[130%] md:w-[130%]" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
