@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "consolidate": "node consolidate.js",
-    "dev": "npm run consolidate && next dev",
-    "build": "npm run consolidate && npx prisma generate && next build",
+    "dev": "next dev",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.15.0"
   },
   "packageManager": "npm@10.9.0",
   "dependencies": {

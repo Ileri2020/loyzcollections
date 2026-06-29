@@ -4,7 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client/edge";
+import { PrismaClient } from "@prisma/client";
 
 
 const prisma = new PrismaClient();
