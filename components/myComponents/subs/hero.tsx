@@ -149,7 +149,7 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
 
   if (variant === 'modern-split') {
     return (
-      <div className="relative overflow-hidden py-8 md:py-20 bg-background">
+      <div className="relative overflow-hidden py-4 md:py-20 bg-background h-[90vh]">
         <BackgroundEffects />
         <div className="relative z-10 container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
           <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -160,16 +160,16 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
                 <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-accent/10 text-accent hover:bg-accent/20">
                   <Star className="mr-1 h-3 w-3 fill-accent" /> #1st Choice
                 </div>
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative /block lg:hidden h-[300px] -z-10 w-full">
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative /block lg:hidden h-[340px] -z-10 w-full justify-center">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative w-[400px] h-[400px] bg-accent/10 rounded-full animate-blob mix-blend-multiply filter blur-xl opacity-70"></div>
                     <div className="relative w-[400px] h-[400px] bg-primary/10 rounded-full animate-blob animation-delay-2000 mix-blend-multiply filter blur-xl opacity-70 -ml-20"></div>
-                    <img src="/mission-burrito-fast-food-shawarma-kati-roll-breakfast-6dd86711999109a88eae948201cd24bf.png" alt="Delicious Food" className="relative z-10 w-[450px] h-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500" />
+                    <img src="/mission-burrito-fast-food-shawarma-kati-roll-breakfast-6dd86711999109a88eae948201cd24bf.png" alt="Delicious Food" className="absolute z-10 w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 mx-auto" />
                   </div>
                 </motion.div>
                 <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mt-4">
-                  <span className="block text-foreground">Affordable Quality Made For You</span>
-                  <span className="block text-accent text-2xl md:text-3xl">STYLE . QUALITY . AFFORDABLE</span>
+                  <span className="text-foreground">Affordable Quality Made For You</span>
+                  <span className="text-accent text-2xl md:text-3xl">STYLE . QUALITY . AFFORDABLE</span>
                 </h1>
                 <DynamicText />
                 <p className="max-w-[600px] text-lg text-muted-foreground md:text-xl leading-relaxed">
