@@ -5,11 +5,15 @@ import Google from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 
 const prisma = new PrismaClient();
 
+const isValidObjectId = (id?: string) => typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id);
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   trustHost: true,
   providers: [
     Credentials({
@@ -70,9 +74,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role ?? null;
         token.image = user.image ?? null;
         token.providerid = user.providerid ?? null;
-        token.addresses = await prisma.shippingAddress.findMany({
-          where: { userId: user.id },
-        });
+        token.addresses = isValidObjectId(user.id)
+          ? await prisma.shippingAddress.findMany({ where: { userId: user.id } })
+          : [];
       }
       return token;
     },
@@ -86,9 +90,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.role = token.role ?? null;
       session.user.image = token.image ?? null;
       session.user.providerid = token.providerid ?? null;
-      session.user.addresses = await prisma.shippingAddress.findMany({
-        where: { userId: token.id },
-      });
+      session.user.addresses = isValidObjectId(token.id)
+        ? await prisma.shippingAddress.findMany({ where: { userId: token.id } })
+        : [];
       session.user.shippingAddress = session.user.addresses[0] || null;
       return session;
     },
