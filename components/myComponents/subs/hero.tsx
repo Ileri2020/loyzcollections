@@ -136,7 +136,7 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
     <div className={`flex flex-wrap gap-5 text-sm ${className} mt-4`}>
       <div className="flex items-center gap-1.5">
         <Truck className="h-5 w-5 text-primary" />
-        <span>Free shipping over ₦200,000</span>
+        <span>Fast shipping & delivery</span>
       </div>
       <div className="flex items-center gap-1.5">
         <Clock className="h-5 w-5 text-primary" />

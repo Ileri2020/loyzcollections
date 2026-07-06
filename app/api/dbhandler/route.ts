@@ -138,13 +138,44 @@ export async function GET(req: NextRequest) {
   // INCLUDE MAP
   // =====================
   const includeMap: Record<string, any> = {
-    product: { category: true, stock: true, reviews: true },
+    product: {
+      category: true,
+      stock: true,
+      reviews: true,
+      cartItems: {
+        include: {
+          cart: true,
+        },
+      },
+    },
     featuredProduct: {
-      product: { include: { category: true, stock: true, reviews: true } },
+      product: {
+        include: {
+          category: true,
+          stock: true,
+          reviews: true,
+          cartItems: {
+            include: {
+              cart: true,
+            },
+          },
+        },
+      },
     },
     review: {
       user: { select: { id: true, name: true, email: true, image: true } },
-      product: true,
+      product: {
+        include: {
+          category: true,
+          stock: true,
+          reviews: true,
+          cartItems: {
+            include: {
+              cart: true,
+            },
+          },
+        },
+      },
     },
     post: { author: true },
     cart: {

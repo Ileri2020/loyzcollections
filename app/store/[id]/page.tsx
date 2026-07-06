@@ -87,9 +87,20 @@ export default function ProductDetailPage() {
 
       /** ✅ FIX: calculate stock correctly */
       const totalStock =
-        Array.isArray(data.stock)
-          ? data.stock.reduce(
+        !data.stock || data.stock.length === 0
+          ? 1
+          : data.stock.reduce(
             (sum: number, s: any) => sum + (s.addedQuantity ?? 0),
+            0
+          );
+
+      const totalSold =
+        Array.isArray(data.cartItems)
+          ? data.cartItems.reduce(
+            (sum: number, item: any) => {
+              const isPaid = item.cart?.status === "paid" || item.cart?.status === "completed";
+              return sum + (isPaid ? item.quantity : 0);
+            },
             0
           )
           : 0;
@@ -108,7 +119,7 @@ export default function ProductDetailPage() {
             0
           ) / data.reviews.length
           : 0,
-        inStock: totalStock > 0,
+        inStock: (totalStock - totalSold) > 0,
         features: [],
         specs: {},
       };

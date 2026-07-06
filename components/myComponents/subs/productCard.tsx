@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getProductPrice, isProductInStock } from "@/lib/stock-pricing";
-import { Heart, ShoppingCart, Star, Edit3, Trash2 } from "lucide-react";
+import { Heart, ShoppingCart, Star, Edit3, Trash2, Tag } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -85,6 +85,17 @@ export function ProductCard({
    */
   const currentPrice = getProductPrice(product);
   const inStock = typeof product.inStock === 'boolean' ? product.inStock : isProductInStock(product);
+
+  const totalSold = React.useMemo(() => {
+    if (!product.cartItems || product.cartItems.length === 0) return 0;
+    return product.cartItems.reduce((total: number, item: any) => {
+      const isPaid = item.cart?.status === "paid" || item.cart?.status === "completed";
+      return total + (isPaid ? (item.quantity || 0) : 0);
+    }, 0);
+  }, [product.cartItems]);
+
+  const isSold = totalSold > 0;
+
   const categoryName = product?.category?.name || "Product";
   const image = product?.images?.[0] || "/placeholder.png";
 
@@ -288,7 +299,7 @@ export function ProductCard({
                     "w-full gap-2 transition-all",
                     isAddingToCart && "opacity-70"
                   )}
-                  disabled={isAddingToCart}
+                  disabled={isAddingToCart || !inStock}
                   onClick={handleAddToCart}
                 >
                   {isAddingToCart ? (
@@ -316,7 +327,7 @@ export function ProductCard({
                   </div>
                   <Button
                     className="h-8 w-8 rounded-full"
-                    disabled={isAddingToCart}
+                    disabled={isAddingToCart || !inStock}
                     onClick={handleAddToCart}
                     size="icon"
                     variant="ghost"
@@ -328,10 +339,21 @@ export function ProductCard({
             )}
 
             {!inStock && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-                <Badge className="px-3 py-1 text-sm" variant="destructive">
-                  Out of Stock
-                </Badge>
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-20">
+                {isSold ? (
+                  <div className="flex flex-col items-center gap-1.5 animate-in fade-in-50 zoom-in-95 duration-200">
+                    <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive border-2 border-destructive/20 shadow-sm">
+                      <Tag className="h-5 w-5" />
+                    </div>
+                    <Badge className="px-3 py-1 text-sm font-semibold tracking-wide uppercase shadow-sm" variant="destructive">
+                      Sold Out
+                    </Badge>
+                  </div>
+                ) : (
+                  <Badge className="px-3 py-1 text-sm" variant="destructive">
+                    Out of Stock
+                  </Badge>
+                )}
               </div>
             )}
           </div>

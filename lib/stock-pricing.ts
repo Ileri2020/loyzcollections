@@ -18,19 +18,38 @@ export interface StockItem {
     createdAt: string | Date;
 }
 
+export interface CartItemWithCart {
+    quantity: number;
+    cart: {
+        status: string;
+    };
+}
+
 export interface ProductWithStock {
     id: string;
     name: string;
     price: number;
     stock?: StockItem[];
+    cartItems?: CartItemWithCart[];
 }
 
 /**
  * Calculate total available stock quantity
  */
-export function getTotalStockQuantity(stocks: StockItem[]): number {
-    if (!stocks || stocks.length === 0) return 0;
+export function getTotalStockQuantity(stocks?: StockItem[]): number {
+    if (!stocks || stocks.length === 0) return 1;
     return stocks.reduce((total, stock) => total + (stock.addedQuantity || 0), 0);
+}
+
+/**
+ * Get confirmed sold quantity
+ */
+export function getConfirmedSoldQuantity(cartItems?: CartItemWithCart[]): number {
+    if (!cartItems || cartItems.length === 0) return 0;
+    return cartItems.reduce((total, item) => {
+        const isPaid = item.cart?.status === "paid" || item.cart?.status === "completed";
+        return total + (isPaid ? (item.quantity || 0) : 0);
+    }, 0);
 }
 
 /**
@@ -93,7 +112,9 @@ export function getProductCost(product: ProductWithStock): number {
  * Check if product is in stock
  */
 export function isProductInStock(product: ProductWithStock): boolean {
-    return getTotalStockQuantity(product.stock || []) > 0;
+    const totalStock = getTotalStockQuantity(product.stock || []);
+    const totalSold = getConfirmedSoldQuantity(product.cartItems || []);
+    return (totalStock - totalSold) > 0;
 }
 
 /**
@@ -105,7 +126,9 @@ export function getStockStatus(product: ProductWithStock): {
     currentPrice: number;
     currentCost: number;
 } {
-    const quantity = getTotalStockQuantity(product.stock || []);
+    const totalStock = getTotalStockQuantity(product.stock || []);
+    const totalSold = getConfirmedSoldQuantity(product.cartItems || []);
+    const quantity = Math.max(0, totalStock - totalSold);
 
     return {
         inStock: quantity > 0,

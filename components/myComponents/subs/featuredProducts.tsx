@@ -38,6 +38,8 @@ export interface FeaturedProductType {
   images: string[];
   inStock: boolean;
   rating?: number;
+  stock?: any[];
+  cartItems?: any[];
 }
 
 /* ===============================
@@ -68,8 +70,19 @@ const FeaturedProducts = () => {
 
       const mapped: FeaturedProductType[] = data.map((item: any) => {
         const totalStock =
-          item.product.stock?.reduce(
-            (sum: number, s: any) => sum + (s.addedQuantity ?? 0),
+          !item.product.stock || item.product.stock.length === 0
+            ? 1
+            : item.product.stock.reduce(
+              (sum: number, s: any) => sum + (s.addedQuantity ?? 0),
+              0
+            );
+
+        const totalSold =
+          item.product.cartItems?.reduce(
+            (sum: number, ci: any) => {
+              const isPaid = ci.cart?.status === "paid" || ci.cart?.status === "completed";
+              return sum + (isPaid ? ci.quantity : 0);
+            },
             0
           ) ?? 0;
 
@@ -92,8 +105,10 @@ const FeaturedProducts = () => {
             item.product.images?.length > 0
               ? item.product.images
               : ["/placeholder.png"],
-          inStock: totalStock > 0,
+          inStock: (totalStock - totalSold) > 0,
           rating,
+          stock: item.product.stock,
+          cartItems: item.product.cartItems,
         };
       });
 

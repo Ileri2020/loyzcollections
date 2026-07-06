@@ -20,6 +20,8 @@ type Product = {
   images: string[];
   category: any;
   rating?: number;
+  stock?: any[];
+  cartItems?: any[];
 };
 
 import { useAppContext } from "@/hooks/useAppContext";
@@ -107,7 +109,6 @@ const Stocks = ({ categoryFilter, search, selectedId }: StocksProps) => {
           key={product.id}
           product={{
             ...product,
-            inStock: true,
             rating: product.rating ?? 5,
           }}
           orientation="horizontal"
