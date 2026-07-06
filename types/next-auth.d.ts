@@ -18,10 +18,10 @@ declare module "next-auth" {
   }
 
   interface User {
-    id: string;
+    id?: string;
     name?: string | null;
-    email: string;
-    role: string;
+    email?: string | null;
+    role?: string | null;
     contact?: string | null;
     image?: string | null;
     providerid?: string | null;
