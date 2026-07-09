@@ -109,7 +109,7 @@ const Signup = () => {
         <DrawerContent className='flex flex-col justify-center items-center py-10 /bg-red-500 max-w-5xl mx-auto'>
 
           <DrawerHeader>
-            <DrawerTitle className='w-full text-center'>Create an account with <span className='text-accent'>Lois Food and Spices</span></DrawerTitle>
+            <DrawerTitle className='w-full text-center'>Create an account with <span className='text-accent'>Loyz Collection</span></DrawerTitle>
             <DrawerDescription></DrawerDescription>
           </DrawerHeader>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-10 bg-secondary rounded-xl max-w-xl"> 

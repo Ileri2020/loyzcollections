@@ -39,14 +39,14 @@ interface Session {
 
 const metadata: Metadata = {
   title: "Loyz Collections",
-  description: "Your one stop store for food items",
+  description: "Look good . Feel confident . Live LOYZ",
 };
 
 export const SEO_CONFIG = {
-  description: 'Your one stop store for food items',
-  fullName: "Lois Food and Spices",
-  name: "Lois Food and Spices",
-  slogan: "Lois Food and Spices",
+  description: 'Look good . Feel confident . Live LOYZ',
+  fullName: "Loyz Collection",
+  name: "Loyz Collection",
+  slogan: "Loyz Collection",
 };
 
 export const SYSTEM_CONFIG = {

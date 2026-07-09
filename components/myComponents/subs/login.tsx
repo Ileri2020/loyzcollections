@@ -159,7 +159,7 @@ const Login = () => {
               {verificationStep === 'login' && 'Login to '}
               {verificationStep === 'verify' && 'Verify Your Email'}
               {verificationStep === 'setPassword' && 'Set Your Password'}
-              <span className='text-accent'> Lois Food and Spices</span>
+              <span className='text-accent'>Loyz Collection</span>
             </DrawerTitle>
             <DrawerDescription>
               {verificationStep === 'verify' && 'We need to verify your email address'}

@@ -70,6 +70,8 @@ interface Address {
   phone?: string | null;
 }
 
+type DeliveryMethod = "delivery" | "pickup";
+
 /* HELPERS */
 const normalizeState = (state?: string | null): string | null => {
   if (!state) return null;
@@ -92,6 +94,7 @@ export function CartClient({ className }: CartProps) {
   const [guestState, setGuestState] = React.useState("Lagos");
   const [guestCity, setGuestCity] = React.useState("");
   const [guestAddress, setGuestAddress] = React.useState("");
+  const [deliveryMethod, setDeliveryMethod] = React.useState<DeliveryMethod>("delivery");
 
   const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(
     user?.addresses?.[0]?.id ?? null
@@ -115,6 +118,12 @@ export function CartClient({ className }: CartProps) {
 
   React.useEffect(() => {
     const fetchDeliveryFee = async () => {
+      if (deliveryMethod === "pickup") {
+        setDbDeliveryFee(0);
+        setLoadingFee(false);
+        return;
+      }
+
       if (!selectedAddress && user?.id !== 'nil') {
         setDbDeliveryFee(0);
         return;
@@ -156,9 +165,9 @@ export function CartClient({ className }: CartProps) {
     };
 
     fetchDeliveryFee();
-  }, [selectedAddress, user?.id, guestState, guestCity]);
+  }, [selectedAddress, user?.id, guestState, guestCity, deliveryMethod]);
 
-  const deliveryFee = items.length > 0 ? dbDeliveryFee : 0;
+  const deliveryFee = items.length > 0 && deliveryMethod === "delivery" ? dbDeliveryFee : 0;
   const totalAmount = Number(subtotal || 0) + Number(deliveryFee || 0);
 
   /* CHECKOUT */
@@ -166,12 +175,16 @@ export function CartClient({ className }: CartProps) {
     if (items.length === 0) return;
 
     if (user?.id === 'nil') {
-      if (!guestName || !guestPhone || !guestAddress || !guestCity || !guestState) {
-        alert("Please fill in all address and contact details.");
+      const requiresAddress = deliveryMethod === "delivery";
+      if (!guestName || !guestPhone || (requiresAddress && (!guestAddress || !guestState))) {
+        alert(requiresAddress ? "Please fill in your contact details and delivery address." : "Please fill in your contact details.");
         return null;
       }
     } else {
-      if (!selectedAddressId) return;
+      if (deliveryMethod === "delivery" && !selectedAddressId) {
+        alert("Please select a delivery address before checkout.");
+        return null;
+      }
       if (!user?.contact || user.contact === "xxxx-xxx-xxxx") {
         alert("Please update your contact information before checkout. Go to your account settings to add your phone number.");
         return null;
@@ -187,9 +200,22 @@ export function CartClient({ className }: CartProps) {
         })),
         deliveryFee,
         total: totalAmount,
-        deliveryAddressId: user?.id !== 'nil' ? selectedAddressId : undefined,
+        deliveryMethod,
+        pickupLocation: deliveryMethod === "pickup" ? "Loyz Collection Pickup Point" : undefined,
+        deliveryAddressId: user?.id !== 'nil' && deliveryMethod === "delivery" ? selectedAddressId : undefined,
+        customerEmail: user?.id !== 'nil' ? user?.email : guestEmail || undefined,
         name: user?.id !== 'nil' ? undefined : guestName,
-        contact: user?.id !== 'nil' ? undefined : `${guestPhone} | Email: ${guestEmail || 'none'} | Address: ${guestAddress}, ${guestCity}, ${guestState}`,
+        contact: user?.id !== 'nil' ? undefined : `${guestPhone} | Email: ${guestEmail || 'none'} | ${deliveryMethod === 'pickup' ? 'Pickup selected' : `Address: ${guestAddress}, ${guestCity || 'N/A'}, ${guestState}`}`,
+        ...(user?.id === 'nil' ? {
+          guestDetails: {
+            name: guestName,
+            phone: guestPhone,
+            email: guestEmail,
+            address: guestAddress,
+            city: guestCity,
+            state: guestState,
+          }
+        } : {}),
         ...(checkoutData?.cartId ? { cartId: checkoutData.cartId } : {}),
       };
 
@@ -307,10 +333,41 @@ export function CartClient({ className }: CartProps) {
         <div className="border-t px-6 py-4 space-y-3 w-full flex flex-col bg-background">
 
           {/* DELIVERY ADDRESS OR EDIT USER */}
+          <div className="rounded-md border border-border/70 bg-secondary/10 p-3">
+            <div className="mb-2 text-sm font-medium">Delivery Option</div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={deliveryMethod === "delivery" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDeliveryMethod("delivery")}
+              >
+                Delivery
+              </Button>
+              <Button
+                type="button"
+                variant={deliveryMethod === "pickup" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDeliveryMethod("pickup")}
+              >
+                Pickup
+              </Button>
+            </div>
+            {deliveryMethod === "pickup" && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Pickup is free and the pickup location will be included in your confirmation email.
+              </p>
+            )}
+          </div>
+
           {user?.id !== 'nil' ? (
             <div className="space-y-1">
-              <label className="text-sm font-medium">Delivery Address</label>
-              {user.addresses && user.addresses.length > 0 ? (
+              <label className="text-sm font-medium">{deliveryMethod === "pickup" ? "Pickup Details" : "Delivery Address"}</label>
+              {deliveryMethod === "pickup" ? (
+                <div className="rounded-md border border-dashed border-border/70 bg-background/70 p-3 text-sm text-muted-foreground">
+                  Pickup is selected. No delivery address is needed for checkout.
+                </div>
+              ) : user.addresses && user.addresses.length > 0 ? (
                 <div>
                   <select
                     className="w-full rounded-md border px-3 py-2 text-sm"
@@ -385,20 +442,25 @@ export function CartClient({ className }: CartProps) {
                 </select>
                 <input
                   type="text"
-                  placeholder="City"
+                  placeholder="City (optional)"
                   className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
                   value={guestCity}
                   onChange={(e) => setGuestCity(e.target.value)}
-                  required
                 />
               </div>
-              <textarea
-                placeholder="Street Address"
-                className="w-full rounded-md border bg-background px-3 py-1.5 text-sm h-16 resize-none"
-                value={guestAddress}
-                onChange={(e) => setGuestAddress(e.target.value)}
-                required
-              />
+              {deliveryMethod === "delivery" ? (
+                <textarea
+                  placeholder="Street Address"
+                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm h-16 resize-none"
+                  value={guestAddress}
+                  onChange={(e) => setGuestAddress(e.target.value)}
+                  required
+                />
+              ) : (
+                <div className="rounded-md border border-dashed border-border/70 bg-background/70 p-3 text-sm text-muted-foreground">
+                  Pickup selected. The pickup location will be shared in your confirmation email.
+                </div>
+              )}
             </div>
           )}
 
@@ -409,7 +471,7 @@ export function CartClient({ className }: CartProps) {
           </div>
 
           <div className="flex justify-between text-sm">
-            <span>Delivery Fee</span>
+            <span>{deliveryMethod === "pickup" ? "Pickup Fee" : "Delivery Fee"}</span>
             <span>₦{Number(deliveryFee || 0).toFixed(2)}</span>
           </div>
 

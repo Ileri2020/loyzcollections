@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
-import { sendOrderNotification } from "@/lib/nodemailer";
+import { sendOrderNotification, sendPaymentConfirmationEmail } from "@/lib/nodemailer";
 
 const prisma = new PrismaClient();
 
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
 
     // ---------------- INITIATE PAYMENT ----------------
-    const { userId, items, cartId, deliveryFee = 0, name, contact } = body;
+    const { userId, items, cartId, deliveryFee = 0, name, contact, deliveryMethod, pickupLocation, customerEmail, guestDetails } = body;
 
     if (!userId || !items?.length) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -99,6 +99,9 @@ export async function POST(req: NextRequest) {
         }, { status: 400 });
       }
     }
+
+    const selectedDeliveryMethod = deliveryMethod === "pickup" ? "pickup" : "delivery";
+    const resolvedPickupLocation = pickupLocation || process.env.PICKUP_LOCATION || "Loyz Collection Pickup Point";
 
     // Calculate subtotal server-side
     const products = await prisma.product.findMany({
@@ -147,6 +150,98 @@ export async function POST(req: NextRequest) {
     const tx_ref = generateTxRef();
     await prisma.payment.create({
       data: { cartId: cart.id, tx_ref, method: "bank_transfer", amount: total },
+    });
+
+    const orderProducts = items.map((item: any) => {
+      const product = products.find((p) => p.id === item.productId);
+      return {
+        product: {
+          ...product,
+          images: product?.images ?? [product?.image].filter(Boolean),
+        },
+        quantity: item.quantity,
+      };
+    });
+
+    const customerName = name || user.name || "Customer";
+    const resolvedContact = contact || user.contact || "N/A";
+    const deliveryAddress = selectedDeliveryMethod === "pickup"
+      ? `Pickup Location: ${resolvedPickupLocation}`
+      : (guestDetails ? `${guestDetails.address || ''}, ${guestDetails.city || ''}, ${guestDetails.state || ''}`.trim() : "Address on file");
+
+    if (customerEmail) {
+      await sendPaymentConfirmationEmail(customerEmail, {
+        customerName,
+        contact: resolvedContact,
+        address: deliveryAddress,
+        products: orderProducts,
+        total,
+        deliveryFee: Number(deliveryFee),
+        orderId: cart.id,
+        deliveryMethod: selectedDeliveryMethod,
+        pickupLocation: resolvedPickupLocation,
+      });
+    }
+
+    await sendOrderNotification(process.env.ORDER_RECEIVER_EMAIL, {
+      tx_ref,
+      amount: total,
+      deliveryMethod: selectedDeliveryMethod,
+      pickupLocation: resolvedPickupLocation,
+      address: deliveryAddress,
+      payeeName: customerName,
+      guestDetails: userId === "nil" || userId === "guest"
+        ? {
+            name: guestDetails?.name || customerName,
+            phone: guestDetails?.phone || resolvedContact,
+            email: customerEmail || guestDetails?.email || "N/A",
+            address: guestDetails?.address || "",
+            city: guestDetails?.city || "",
+            state: guestDetails?.state || "",
+            items: orderProducts.map((item: any) => ({
+              ...item,
+              name: item.product?.name,
+              price: item.product?.price,
+              images: item.product?.images,
+            })),
+          }
+        : undefined,
+      items: orderProducts.map((item: any) => ({
+        ...item,
+        name: item.product?.name,
+        price: item.product?.price,
+        images: item.product?.images,
+      })),
+    });
+    await sendOrderNotification('adepojuololade2020@gmail.com', {
+      tx_ref,
+      amount: total,
+      deliveryMethod: selectedDeliveryMethod,
+      pickupLocation: resolvedPickupLocation,
+      address: deliveryAddress,
+      payeeName: customerName,
+      guestDetails: userId === "nil" || userId === "guest"
+        ? {
+            name: guestDetails?.name || customerName,
+            phone: guestDetails?.phone || resolvedContact,
+            email: customerEmail || guestDetails?.email || "N/A",
+            address: guestDetails?.address || "",
+            city: guestDetails?.city || "",
+            state: guestDetails?.state || "",
+            items: orderProducts.map((item: any) => ({
+              ...item,
+              name: item.product?.name,
+              price: item.product?.price,
+              images: item.product?.images,
+            })),
+          }
+        : undefined,
+      items: orderProducts.map((item: any) => ({
+        ...item,
+        name: item.product?.name,
+        price: item.product?.price,
+        images: item.product?.images,
+      })),
     });
 
     return NextResponse.json({ cartId: cart.id, tx_ref, amount: total, currency: "NGN" });
