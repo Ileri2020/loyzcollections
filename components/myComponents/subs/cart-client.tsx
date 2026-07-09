@@ -244,7 +244,7 @@ export function CartClient({ className }: CartProps) {
 
   /* CART CONTENT */
   const CartContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col overflow-hidden">
       {/* HEADER */}
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div>
@@ -269,8 +269,7 @@ export function CartClient({ className }: CartProps) {
         </div>
       </div>
 
-      {/* ITEMS */}
-      <div className="flex-1 overflow-y-auto px-6">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
         <AnimatePresence>
           {items.length === 0 ? (
             <motion.div className="py-12 text-center">
@@ -326,11 +325,9 @@ export function CartClient({ className }: CartProps) {
             </div>
           )}
         </AnimatePresence>
-      </div>
 
-      {/* SUMMARY */}
-      {items.length > 0 && (
-        <div className="border-t px-6 py-4 space-y-3 w-full flex flex-col bg-background">
+        {items.length > 0 && (
+          <div className="mt-4 border-t pt-4 space-y-3 w-full flex flex-col bg-background">
 
           {/* DELIVERY ADDRESS OR EDIT USER */}
           <div className="rounded-md border border-border/70 bg-secondary/10 p-3">
@@ -544,6 +541,7 @@ export function CartClient({ className }: CartProps) {
           </div>
         </div>
       )}
+      </div>
 
     </div>
   );
