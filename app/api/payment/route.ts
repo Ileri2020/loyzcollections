@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
       return {
         product: {
           ...product,
-          images: product?.images ?? [product?.image].filter(Boolean),
+          images: product?.images ?? [],
         },
         quantity: item.quantity,
       };
