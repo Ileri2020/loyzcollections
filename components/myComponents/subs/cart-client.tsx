@@ -425,34 +425,36 @@ export function CartClient({ className }: CartProps) {
                 value={guestEmail}
                 onChange={(e) => setGuestEmail(e.target.value)}
               />
-              <div className="grid grid-cols-2 gap-2">
-                <select
-                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
-                  value={guestState}
-                  onChange={(e) => setGuestState(e.target.value)}
-                >
-                  {Object.keys(DELIVERY_FEES_BY_STATE).map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                  <option value="FCT">FCT</option>
-                  <option value="Plateau">Plateau</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="City (optional)"
-                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
-                  value={guestCity}
-                  onChange={(e) => setGuestCity(e.target.value)}
-                />
-              </div>
               {deliveryMethod === "delivery" ? (
-                <textarea
-                  placeholder="Street Address"
-                  className="w-full rounded-md border bg-background px-3 py-1.5 text-sm h-16 resize-none"
-                  value={guestAddress}
-                  onChange={(e) => setGuestAddress(e.target.value)}
-                  required
-                />
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                      value={guestState}
+                      onChange={(e) => setGuestState(e.target.value)}
+                    >
+                      {Object.keys(DELIVERY_FEES_BY_STATE).map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                      <option value="FCT">FCT</option>
+                      <option value="Plateau">Plateau</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="City (optional)"
+                      className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                      value={guestCity}
+                      onChange={(e) => setGuestCity(e.target.value)}
+                    />
+                  </div>
+                  <textarea
+                    placeholder="Street Address"
+                    className="w-full rounded-md border bg-background px-3 py-1.5 text-sm h-16 resize-none"
+                    value={guestAddress}
+                    onChange={(e) => setGuestAddress(e.target.value)}
+                    required
+                  />
+                </>
               ) : (
                 <div className="rounded-md border border-dashed border-border/70 bg-background/70 p-3 text-sm text-muted-foreground">
                   Pickup selected. The pickup location will be shared in your confirmation email.

@@ -1,6 +1,8 @@
 // ... existing imports
 import nodemailer from 'nodemailer';
 
+const PICKUP_ADDRESS = 'Last floor, Adeniyi house, beside mr ten, opposite united schools, Taiwo isale, ilorin, Kwara state';
+
 const email = process.env.GOOGLE_EMAIL ?? 'adepojuololade2020@gmail.com';
 
 const transporter = nodemailer.createTransport({
@@ -43,7 +45,7 @@ export const sendOrderNotification = async (to: string, orderDetails: any) => {
         if (orderDetails.guestDetails) {
             const gd = orderDetails.guestDetails;
             const deliveryLine = orderDetails.deliveryMethod === 'pickup'
-                ? `<p><strong>Pickup Location:</strong> ${escapeHtml(orderDetails.pickupLocation || 'Loyz Collection Pickup Point')}</p>`
+                ? `<p><strong>Pickup Location:</strong> ${escapeHtml(orderDetails.pickupLocation || PICKUP_ADDRESS)}</p>`
                 : `<p><strong>Shipping Address:</strong> ${escapeHtml([gd.address, gd.city, gd.state].filter(Boolean).join(', ') || 'N/A')}</p>`;
 
             guestDetailsHtml = `
@@ -91,7 +93,7 @@ export const sendOrderNotification = async (to: string, orderDetails: any) => {
                         <p><strong>Reference:</strong> ${orderDetails.tx_ref}</p>
                         <p><strong>Delivery Method:</strong> ${orderDetails.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
                         ${orderDetails.deliveryMethod === 'pickup'
-                            ? `<p><strong>Pickup Location:</strong> ${escapeHtml(orderDetails.pickupLocation || 'Loyz Collection Pickup Point')}</p>`
+                            ? `<p><strong>Pickup Location:</strong> ${escapeHtml(orderDetails.pickupLocation || PICKUP_ADDRESS)}</p>`
                             : `<p><strong>Delivery Address:</strong> ${escapeHtml(orderDetails.address || 'N/A')}</p>`}
                         <p><strong>Total Amount:</strong> <span style="font-size: 18px; font-weight: bold; color: #16a34a;">₦${orderDetails.amount.toLocaleString()}</span></p>
                         <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
@@ -99,7 +101,10 @@ export const sendOrderNotification = async (to: string, orderDetails: any) => {
 
                     ${guestDetailsHtml}
 
+                    ${itemsHtml}
+
                     <p>Please log in to the admin panel to confirm this payment once the funds are received in the bank account.</p>
+                    ${itemsHtml}
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
                     <p style="color: #6b7280; font-size: 12px;">© 2026 Loyz Collection. All rights reserved.</p>
                 </div>
@@ -178,7 +183,7 @@ export const sendPaymentConfirmationEmail = async (to: string, data: {
                         <p><strong>Order ID:</strong> ${data.orderId}</p>
                         <p><strong>Delivery Method:</strong> ${data.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
                         ${data.deliveryMethod === 'pickup'
-                            ? `<p><strong>Pickup Location:</strong> ${escapeHtml(data.pickupLocation || 'Loyz Collection Pickup Point')}</p>`
+                            ? `<p><strong>Pickup Location:</strong> ${escapeHtml(data.pickupLocation || PICKUP_ADDRESS)}</p>`
                             : `<p><strong>Delivery Address:</strong> ${escapeHtml(data.address || 'N/A')}</p>`}
                         <p><strong>Contact:</strong> ${escapeHtml(data.contact || 'N/A')}</p>
                     </div>

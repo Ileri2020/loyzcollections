@@ -6,9 +6,9 @@ const Features = () => {
     const featuresWhyChooseUs = [
         {
           description:
-            "Free shipping on all orders over ₦200,000 within Nigeria. Fast and reliable delivery to your doorstep.",
+            "Fast shipping for all orders over within Nigeria. Fast and reliable delivery to your doorstep.",
           icon: <Truck className="h-6 w-6 text-primary" />,
-          title: "Free Shipping",
+          title: "Fast Shipping",
         },
         {
           description:
@@ -78,6 +78,7 @@ const Features = () => {
               rounded-2xl border-none bg-background shadow transition-all
               duration-300
               hover:shadow-lg
+              shadow-md shadow-accent/40 rounded-2xl
             `}
             key={feature.title}
           >

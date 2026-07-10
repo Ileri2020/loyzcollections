@@ -10,6 +10,7 @@ import { Suspense, useEffect } from "react"
 import { AiOutlineSearch } from "react-icons/ai"
 import { Advert } from "@/components/myComponents/subs"
 import loyzspiceslogo from "@/public/logo.png"
+import loyzspicesdarklogo from "@/public/logo - Copy.png"
 import Image from "next/image";
 import { Cart } from '../myComponents/subs/cart';
 import { SearchInput } from '../myComponents/subs/searchcomponent';
@@ -67,8 +68,8 @@ const Navbar = (): JSX.Element => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link href={"/"} className="hidden dark:flex flex-1 md:flex-none max-h-[43px] md:max-h-[50px] overflow-clip justify-center items-center py-5">
-                  <Image src={loyzspiceslogo} alt="Home" className="w-[100px] h-auto" />
+                <Link href={"/"} className="animate-pulse dark:flex hidden flex-1 md:flex-none h-full max-h-[200px] md:max-h-[50px] /bg-red-500 overflow-clip justify-center items-center">
+                  <Image src={loyzspicesdarklogo} alt="Home" className="h-[100%] w-[35%] md:h-[130%] md:w-[130%]" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>

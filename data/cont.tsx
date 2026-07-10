@@ -25,8 +25,13 @@ export default {
         },
         {
             icon : <CiLocationOn/>,
-            text: "address",
-            value: "26, Stadium Road, Adjacent to Olalomi Hospital, Taiwo, Ilorin, Kwara State, Nigeria."
+            text: "Pick up address",
+            value: (
+                <>
+                    Last floor, Adeniyi house, beside mr ten, opposite united schools,<br />
+                    Taiwo isale, ilorin, Kwara state
+                </>
+            )
         },
     ],
     team : [

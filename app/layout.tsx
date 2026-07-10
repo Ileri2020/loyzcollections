@@ -77,7 +77,7 @@ export default async function RootLayout({
               <CartProvider>
                 <ThemeProvider
                   attribute="class"
-                  defaultTheme="light"
+                  defaultTheme="dark"
                   enableSystem
                   disableTransitionOnChange
                 >

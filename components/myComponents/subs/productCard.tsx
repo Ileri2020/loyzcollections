@@ -296,7 +296,7 @@ export function ProductCard({
               <CardFooter className="p-4 pt-0">
                 <Button
                   className={cn(
-                    "w-full gap-2 transition-all",
+                    "w-full gap-2 transition-all dark:text-primary",
                     isAddingToCart && "opacity-70"
                   )}
                   disabled={isAddingToCart || !inStock}
