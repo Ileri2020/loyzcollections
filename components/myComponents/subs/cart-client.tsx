@@ -457,7 +457,7 @@ export function CartClient({ className }: CartProps) {
                 </>
               ) : (
                 <div className="rounded-md border border-dashed border-border/70 bg-background/70 p-3 text-sm text-muted-foreground">
-                  Pickup selected. The pickup location will be shared in your confirmation email.
+                  Last floor, Adeniyi house, beside mr ten, opposite united schools, Taiwo isale, ilorin, Kwara state. The pickup location will be shared in your confirmation email.
                 </div>
               )}
             </div>

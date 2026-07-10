@@ -1,16 +1,16 @@
 "use client"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-//import { useLocation} from "react-router-dom"
+import Image from "next/image"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Link from "next/link"
 import { CiMenuFries } from "react-icons/ci"
-import Links from "../../data/links";
+import Links from "../../data/links"
 import { ModeToggle } from '@/components/ui/mode-toggle'
-import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useAppContext } from "@/hooks/useAppContext";
-import { signOut } from "next-auth/react";
+import { usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { useAppContext } from "@/hooks/useAppContext"
+import { signOut } from "next-auth/react"
 import dynamic from 'next/dynamic'
-const Login = dynamic(() => import('@/components/myComponents/subs').then((e) => e.Login), { ssr: false, })
+const Login = dynamic(() => import('@/components/myComponents/subs').then((e) => e.Login), { ssr: false })
 import { Signup } from "@/components/myComponents/subs"
 
 const Sidenav = () => {
@@ -21,55 +21,80 @@ const Sidenav = () => {
             <SheetTrigger className="flex justify-center items-center text-[32px] text-accent">
                 <CiMenuFries />
             </SheetTrigger>
-            <SheetHeader></SheetHeader>
-            <SheetTitle></SheetTitle>
-            <SheetContent className="flex flex-col justify-between items-center">
-                <nav className="flex flex-col justify-center items-center gap-8 text-xl">
-                    {Links.Links.map((link, index) => {
-                        return (
-                            <Link href={link.path} key={index} className={`${link.path === pathname && "text-accent border-b-2 border-accent"} capitalize font-medium hover:text-accent transition-all flex items-center gap-2`}>
-                                {link.icon}
-                                {link.name}
-                            </Link>
-                        )
-                    })}
+            <SheetContent side="left" className="flex h-full flex-col justify-between gap-6 px-6 py-8">
+                <div className="flex flex-col items-start gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 overflow-hidden rounded-xl shadow-md shadow-accent/70 bg-accent/10">
+                            <Image
+                                src="/logo.png"
+                                alt="Loyz Collections"
+                                width={48}
+                                height={48}
+                                className="object-contain"
+                            />
+                        </div>
+                        <div>
+                            {/* <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Brand</p> */}
+                            <h2 className="text-lg font-semibold">Loyz Collections</h2>
+                        </div>
+                    </div>
+                    <p className="max-w-xs text-sm text-muted-foreground">Look good. Feel confident. Live LOYZ.</p>
+                </div>
+
+                <nav className="flex flex-col gap-4 text-base font-medium text-foreground">
+                    {Links.Links.map((link, index) => (
+                        <Link
+                            href={link.path}
+                            key={index}
+                            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
+                                link.path === pathname ? "bg-accent/10 text-accent" : "hover:bg-accent/5"
+                            }`}
+                        >
+                            {link.icon}
+                            <span>{link.name}</span>
+                        </Link>
+                    ))}
                 </nav>
-                {user?.id !== "nil" ? (
-                    <div className="h-12 w-full mx-4">
+
+                <div className="flex flex-col gap-3">
+                    <Button
+                        className="w-full"
+                        variant="outline"
+                        asChild
+                    >
+                        <Link href="/account">Login</Link>
+                    </Button>
+                    <Button
+                        className="w-full"
+                        variant="secondary"
+                        asChild
+                    >
+                        <Link href="/signup">Signup</Link>
+                    </Button>
+                    {user?.id !== "nil" && (
                         <Button
-                            className="bg-red border-2 border-red-500 text-red-600 w-full flex-1"
+                            className="w-full bg-red border-2 border-red-500 text-red-600"
                             variant="outline"
-                            onClick={() => {
-                                signOut({ callbackUrl: "/" });
+                            onClick={async () => {
+                                await signOut({ callbackUrl: "/" });
                                 setUser({
-                                    username: "visitor",
+                                    name: "visitor",
                                     id: "nil",
                                     email: "nil",
-                                    avatarUrl: "",
+                                    image: "",
                                     role: "user",
-                                    department: "nil",
                                     contact: "xxxx",
+                                    addresses: [],
+                                    shippingAddress: null,
                                 });
                             }}
                         >
                             Logout
                         </Button>
+                    )}
+                    <div className="pt-2">
+                        <ModeToggle />
                     </div>
-                ) : (
-                    <div className="w-full">
-                        <p className="font-medium text-red-500">Please log in to proceed with checkout.</p>
-                        <div className="w-full h-[50vh] flex flex-col justify-center items-center">
-                            <div className="font-semibold text-lg text-destructive">You are not logged in</div>
-                            <div className="flex flex-row gap-5">
-                                <Login />
-                                <Signup />
-                            </div>
-                        </div>
-                    </div>
-                )}
-                <div className="my-5 w-full flex flex-row">
-                    <div className="flex w-full flex-1"></div>
-                    <ModeToggle />
                 </div>
             </SheetContent>
         </Sheet>

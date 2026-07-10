@@ -167,9 +167,9 @@ const Hero = ({ variant = 'modern-split' }: HeroProps) => {
                     <img src="/mission-burrito-fast-food-shawarma-kati-roll-breakfast-6dd86711999109a88eae948201cd24bf.png" alt="Delicious Food" className="absolute z-10 w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500" />
                   </div>
                 </motion.div>
-                <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mt-2">
+                <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-3xl md:text-6xl lg:text-7xl mt-2">
                   <span className="block text-foreground">Affordable Quality Made For You</span>
-                  <span className="block text-accent text-2xl md:text-3xl">STYLE . QUALITY . AFFORDABLE</span>
+                  <span className="block text-accent text-xl md:text-2xl">STYLE . QUALITY . AFFORDABLE</span>
                 </h1>
                 <DynamicText />
                 <p className="max-w-[600px] text-lg text-muted-foreground md:text-xl leading-relaxed">

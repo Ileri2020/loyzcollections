@@ -111,16 +111,17 @@ const Account = () => {
           <Button
             className="bg-red border-2 border-red-500 text-red-600 w-full flex-1"
             variant="outline"
-            onClick={() => {
-              signOut({ callbackUrl: "/" }); // redirects after logout
+            onClick={async () => {
+              await signOut({ callbackUrl: "/" });
               setUser({
-                username: "visitor",
+                name: "visitor",
                 id: "nil",
                 email: "nil",
-                avatarUrl: "https://res.cloudinary.com/dc5khnuiu/image/upload/v1752627019/uxokaq0djttd7gsslwj9.png",
+                image: "https://res.cloudinary.com/dc5khnuiu/image/upload/v1752627019/uxokaq0djttd7gsslwj9.png",
                 role: "user",
-                department: "nil",
                 contact: "xxxx",
+                addresses: [],
+                shippingAddress: null,
               });
             }}
           >
