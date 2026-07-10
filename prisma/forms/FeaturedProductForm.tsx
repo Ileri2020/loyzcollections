@@ -10,6 +10,7 @@ interface Product {
   name: string;
   price?: number;
   description?: string;
+  images?: string[];
 }
 
 interface FeaturedProduct {
@@ -182,43 +183,59 @@ export default function FeaturedProductForm({ hideList = false }: FeaturedProduc
         {/* Product List */}
         <div className="w-full mt-2">
           <Label className="text-sm font-medium">Select Product to Feature</Label>
-          <ul className="mb-2 max-h-64 overflow-y-auto border rounded-md p-1 mt-1">
-            {filteredProducts.map((item, index) => {
+          <div className="mt-1 max-h-[320px] overflow-y-auto rounded-md border bg-background/50 p-2">
+            {filteredProducts.map((item) => {
               const isFeatured = featuredIds.has(item.id);
+              const imageUrl = item.images?.[0] || "/placeholder.png";
 
               return (
-                <li
+                <div
                   key={item.id}
-                  className="flex flex-col gap-1 mb-2 bg-secondary/50 rounded-md p-2 hover:bg-secondary transition-colors"
+                  className="mb-2 flex items-start gap-3 rounded-md border bg-secondary/40 p-2 transition-colors hover:bg-secondary"
                 >
-                  <div className="flex justify-between items-center w-full">
-                    <span className="font-medium text-sm">
-                      {item.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground">₦{item.price ?? 0}</span>
-                  </div>
+                  <img
+                    src={imageUrl}
+                    alt={item.name}
+                    className="h-12 w-12 flex-shrink-0 rounded-md object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/placeholder.png";
+                    }}
+                  />
 
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={() => handleFeatureClick(item)}
-                    disabled={isFeatured || isLimitReached}
-                    variant={isFeatured ? "outline" : "default"}
-                  >
-                    {isFeatured
-                      ? "Featured"
-                      : isLimitReached
-                      ? "Limit Reached"
-                      : "Add Feature"}
-                  </Button>
-                </li>
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-sm font-medium leading-tight">
+                        {item.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        ₦{item.price ?? 0}
+                      </span>
+                    </div>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-7 w-full text-xs"
+                      onClick={() => handleFeatureClick(item)}
+                      disabled={isFeatured || isLimitReached}
+                      variant={isFeatured ? "outline" : "default"}
+                    >
+                      {isFeatured
+                        ? "Featured"
+                        : isLimitReached
+                        ? "Limit Reached"
+                        : "Add Feature"}
+                    </Button>
+                  </div>
+                </div>
               );
             })}
             {filteredProducts.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-4">No products found</p>
+              <p className="py-4 text-center text-xs text-muted-foreground">
+                No products found
+              </p>
             )}
-          </ul>
+          </div>
         </div>
 
         {editId && (

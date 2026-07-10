@@ -339,7 +339,7 @@ export function ProductCard({
             )}
 
             {!inStock && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-20">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[0.5px] z-20">
                 {isSold ? (
                   <div className="flex flex-col items-center gap-1.5 animate-in fade-in-50 zoom-in-95 duration-200">
                     <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive border-2 border-destructive/20 shadow-sm">

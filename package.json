@@ -10,7 +10,8 @@
     "lint": "next lint",
     "compress-images": "node scripts/compress-product-images.js"
     ,
-    "seed:delivery-fees": "node scripts/set-delivery-fees.js"
+    "seed:delivery-fees": "node scripts/set-delivery-fees.js",
+    "reset:soldout-stock": "node scripts/reset-soldout-stock.js"
   },
   "engines": {
     "node": "24.15.0"
