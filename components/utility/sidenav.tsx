@@ -41,31 +41,31 @@ const Sidenav = () => {
                     <p className="max-w-xs text-sm text-muted-foreground">Look good. Feel confident. Live LOYZ.</p>
                 </div>
 
-                <nav className="flex flex-col gap-4 text-base font-medium text-foreground">
+                <nav className="flex flex-col gap-4 text-base font-medium text-foreground gap-y-5">
                     {Links.Links.map((link, index) => (
                         <Link
                             href={link.path}
                             key={index}
-                            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                                link.path === pathname ? "bg-accent/10 text-accent" : "hover:bg-accent/5"
+                            className={`flex font-bold text-center items-center justify-center bg-accent/5 gap-3 rounded-lg px-3 py-2 transition-colors shadow-md shadow-accent/70 ${
+                                link.path === pathname ? "bg-accent/10 dark:bg-accent/30 text-accent" : "hover:bg-accent/5"
                             }`}
                         >
                             {link.icon}
-                            <span>{link.name}</span>
+                            <span className="text-center">{link.name}</span>
                         </Link>
                     ))}
                 </nav>
 
                 <div className="flex flex-col gap-3">
                     <Button
-                        className="w-full"
+                        className="w-full bg-accent/10 dark:bg-accent/30 text-primary animate-bounce"
                         variant="outline"
                         asChild
                     >
                         <Link href="/account">Login</Link>
                     </Button>
                     <Button
-                        className="w-full"
+                        className="w-full bg-accent/10 dark:bg-accent/30 text-primary"
                         variant="secondary"
                         asChild
                     >
@@ -73,7 +73,7 @@ const Sidenav = () => {
                     </Button>
                     {user?.id !== "nil" && (
                         <Button
-                            className="w-full bg-red border-2 border-red-500 text-red-600"
+                            className="w-full bg-red border-2 border-red-500 text-red-600 text-primary"
                             variant="outline"
                             onClick={async () => {
                                 await signOut({ callbackUrl: "/" });
