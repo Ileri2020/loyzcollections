@@ -103,7 +103,7 @@ const Stocks = ({ categoryFilter, search, selectedId }: StocksProps) => {
   }
 
   return (
-    <div className="h-full max-w-[500px] md:max-w-[1000px] flex gap-5 flex-wrap mx-5 p-2 self-center justify-between">
+    <div className="h-full max-w-[500px] md:max-w-[1000px] flex gap-2 flex-wrap md:mx-5 p-2 self-center justify-between">
       {products.map((product) => (
         <ProductCard
           key={product.id}
@@ -114,7 +114,7 @@ const Stocks = ({ categoryFilter, search, selectedId }: StocksProps) => {
           orientation="horizontal"
           onAddToCart={addItem}
           onAddToWishlist={(id) => openDialog(`Add ${id} to wishlist`, "Wishlist")}
-          className="w-[100vw] md:w-[200px] mb-5 flex flex-row md:flex-col"
+          className="w-[100vw] md:w-[200px] md:mb-5 flex flex-row md:flex-col"
         />
       ))}
     </div>

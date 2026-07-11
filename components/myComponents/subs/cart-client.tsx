@@ -21,6 +21,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import axios from "axios";
+import { addOrUpdateLocalReceipt, LocalReceipt } from "@/lib/localReceipts";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
@@ -115,6 +116,10 @@ export function CartClient({ className }: CartProps) {
   const selectedAddress: Address | undefined = user?.addresses?.find(
     (a: Address) => a.id === selectedAddressId
   );
+
+  const saveLocalReceipt = (receipt: LocalReceipt) => {
+    addOrUpdateLocalReceipt(receipt);
+  };
 
   React.useEffect(() => {
     const fetchDeliveryFee = async () => {
@@ -221,6 +226,40 @@ export function CartClient({ className }: CartProps) {
 
       const res = await axios.post("/api/payment", payload);
       setCheckoutData(res.data);
+
+      saveLocalReceipt({
+        id: res.data.cartId,
+        cartId: res.data.cartId,
+        tx_ref: res.data.tx_ref,
+        createdAt: new Date().toISOString(),
+        status: "pending",
+        total: totalAmount,
+        deliveryFee,
+        items: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        customerName:
+          user?.id !== "nil"
+            ? user.name || "Customer"
+            : guestName || "Guest Customer",
+        contact:
+          user?.id !== "nil"
+            ? user.contact || ""
+            : `${guestPhone}${guestEmail ? ` | ${guestEmail}` : ""}`,
+        deliveryMethod,
+        deliveryAddress:
+          deliveryMethod === "pickup"
+            ? "Pickup Location: Loyz Collection Pickup Point"
+            : user?.id !== "nil"
+            ? `${selectedAddress?.address || ""}${selectedAddress?.city ? ", " + selectedAddress.city : ""}${selectedAddress?.state ? ", " + selectedAddress.state : ""}`.trim()
+            : `${guestAddress}${guestCity ? ", " + guestCity : ""}${guestState ? ", " + guestState : ""}`,
+        receiptUrl: "",
+        linked: user?.id !== "nil",
+      });
+
       return res.data; // Return for reuse
     } catch (err: any) {
       console.error("Checkout initiation failed:", err);
@@ -285,7 +324,7 @@ export function CartClient({ className }: CartProps) {
                     : "/placeholder.jpg";
 
                 return (
-                  <motion.div key={item.id} layout className="flex rounded-lg border bg-card p-2">
+                  <motion.div key={item.id} layout className="flex rounded-lg border bg-card p-2 shadow-md shadow-accent/30">
                     <img src={imageUrl} alt={item.name ?? "Product"} className="h-20 w-20 rounded object-cover" />
                     <div className="ml-4 flex flex-1 flex-col justify-between">
                       <div className="flex justify-between">

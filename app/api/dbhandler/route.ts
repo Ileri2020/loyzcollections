@@ -65,6 +65,36 @@ function parseId(id: string | null, model: string) {
   return id;
 }
 
+function parseFormValue(key: string, value: string | File) {
+  if (value instanceof File) return value;
+  if (typeof value !== "string") return value;
+
+  const trimmed = value.trim();
+
+  if (trimmed === "true" || trimmed === "false") {
+    return trimmed === "true";
+  }
+
+  if (key === "price" || key === "costPrice") {
+    const parsed = parseFloat(trimmed);
+    return Number.isNaN(parsed) ? trimmed : parsed;
+  }
+
+  if (key === "images" || key === "activeIngredients" || key === "for") {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // ignore invalid JSON
+    }
+    if (trimmed.includes(",")) {
+      return trimmed.split(",").map((item) => item.trim()).filter(Boolean);
+    }
+  }
+
+  return trimmed;
+}
+
 
 const DELIVERY_FEES_BY_STATE: Record<string, number> = {
   Kwara: 1000,
@@ -559,7 +589,15 @@ export async function PUT(req: NextRequest) {
       // copy remaining fields
       formData.forEach((value, key) => {
         if (key === "file") return;
-        body[key] = value;
+        const parsedValue = parseFormValue(key, value);
+
+        if (body[key] !== undefined) {
+          body[key] = Array.isArray(body[key])
+            ? [...body[key], parsedValue]
+            : [body[key], parsedValue];
+        } else {
+          body[key] = parsedValue;
+        }
       });
     }
 

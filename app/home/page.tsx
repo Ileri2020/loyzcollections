@@ -5,6 +5,7 @@ import ECommerceSalesPage from "@/components/myComponents/salestore"
 import Hero from "@/components/myComponents/subs/hero"
 import FeaturedCategories from "@/components/myComponents/subs/featuredCategories"
 import FeaturedProducts from "@/components/myComponents/subs/featuredProducts"
+import RecentProducts from "@/components/myComponents/subs/recentProducts"
 import Features from "@/components/myComponents/subs/features"
 import { ScrollScaleWrapper } from "@/components/myComponents/subs/scroll-scale-wrapper"
 
@@ -29,6 +30,10 @@ const Home = () => {
 
       <ScrollScaleWrapper className="w-full flex justify-center">
         <FeaturedProducts />
+      </ScrollScaleWrapper>
+
+      <ScrollScaleWrapper className="w-full flex justify-center">
+        <RecentProducts />
       </ScrollScaleWrapper>
 
       <ScrollScaleWrapper className="w-full flex justify-center">

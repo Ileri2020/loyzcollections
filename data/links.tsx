@@ -8,47 +8,48 @@ import { IoFastFoodOutline } from "react-icons/io5";
 
 
 
-export default {Links : [
-    {
-      icon: <AiOutlineHome />,
-      path: "/",
-      name: "Home",
-    },
-    {
-      icon: <AiOutlineShop />,
-      path: "/store",
-      name: "Store",
-    },
-    // {
-    //   name: <IoMdHelp />,
-    //   path: "/help",
-    // },
-    // {
-    //   name: <IoFastFoodOutline />,
-    //   path: "/lunch",
-    // },
-    {
-      icon: <AiOutlineHistory />,
-      path: "/about",
-      name: "About",
-    },
-    {
-      icon: <BiPhone />,
-      path: "/contact",
-      name: "Contact",
-    },
-    {
-      icon: <VscAccount />,
-      path: "/account",
-      name: "Account",
-    },
-    // {
-    //   name: "blogs",
-    //   path: "/blogs",
-    // },
-    // {
-    //   name: <CiShoppingCart />,
-    //   path: "/cart",
-    // },
-  ]
-}
+const pageLinks = [
+  {
+    icon: <AiOutlineHome />,
+    path: "/",
+    name: "Home",
+  },
+  {
+    icon: <AiOutlineShop />,
+    path: "/store",
+    name: "Store",
+  },
+  // {
+  //   name: <IoMdHelp />,
+  //   path: "/help",
+  // },
+  // {
+  //   name: <IoFastFoodOutline />,
+  //   path: "/lunch",
+  // },
+  {
+    icon: <AiOutlineHistory />,
+    path: "/about",
+    name: "About",
+  },
+  {
+    icon: <BiPhone />,
+    path: "/contact",
+    name: "Contact",
+  },
+  {
+    icon: <VscAccount />,
+    path: "/account",
+    name: "Account",
+  },
+  // {
+  //   name: "blogs",
+  //   path: "/blogs",
+  // },
+  // {
+  //   name: <CiShoppingCart />,
+  //   path: "/cart",
+  // },
+]
+
+export default { Links: pageLinks }

@@ -6,20 +6,72 @@ import dynamic from 'next/dynamic'
 const Login = dynamic(() => import('@/components/myComponents/subs').then((e) => e.Login),{ssr: false,})
 import { Button } from "@/components/ui/button"
 import { BiPencil } from "react-icons/bi"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useAppContext } from "@/hooks/useAppContext"
 import { CiCamera } from "react-icons/ci"
 import {ProfileImg} from "@/components/myComponents/subs/fileupload"
 import { signOut } from "next-auth/react";
 import UserShippingAddressForm from "@/prisma/forms/userShippingAddressForm"
+import { LocalReceipt, loadLocalReceipts } from "@/lib/localReceipts"
 
 const Account = () => {
   const {user, setUser } = useAppContext();
+  const [localReceipts, setLocalReceipts] = useState<LocalReceipt[]>([]);
+
+  useEffect(() => {
+    setLocalReceipts(loadLocalReceipts());
+  }, [user.id]);
+
   if (user.name === "visitor" && user.email === "nil"){
     return(
       <div className="w-full h-[50vh] flex flex-col justify-center items-center">
         <div className="font-semibold text-lg text-destructive">You are not logged in</div>
+        <div className="w-full max-w-xl text-center text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 my-4">
+          Receipts saved here are stored locally on this device only. Without login, receipts will not be linked to your account and may get removed if browser data is cleared.
+        </div>
+        {localReceipts.length > 0 ? (
+          <div className="w-full max-w-xl space-y-3 mb-6">
+            {localReceipts.map((receipt) => (
+              <div key={receipt.cartId} className="rounded-xl border bg-secondary p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Receipt ID</div>
+                    <div className="font-semibold text-sm break-words">{receipt.cartId}</div>
+                  </div>
+                  <div className={`rounded-full px-3 py-1 text-xs font-semibold ${receipt.linked ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    {receipt.linked ? 'Linked' : 'Local only'}
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+                  <div><span className="font-semibold text-foreground">Status:</span> {receipt.status}</div>
+                  <div><span className="font-semibold text-foreground">Total:</span> ₦{receipt.total.toFixed(2)}</div>
+                  <div><span className="font-semibold text-foreground">Date:</span> {new Date(receipt.createdAt).toLocaleString()}</div>
+                  <div><span className="font-semibold text-foreground">Method:</span> {receipt.deliveryMethod}</div>
+                </div>
+                <div className="mt-3 text-sm text-foreground">
+                  <div className="font-semibold">Customer</div>
+                  <div>{receipt.customerName}</div>
+                  <div>{receipt.contact}</div>
+                  <div>{receipt.deliveryAddress}</div>
+                </div>
+                <div className="mt-3 text-sm text-muted-foreground">
+                  <div className="font-semibold">Items</div>
+                  {receipt.items.map((item) => (
+                    <div key={item.id} className="flex justify-between py-1 border-t border-border/70">
+                      <span>{item.name} x{item.quantity}</span>
+                      <span>₦{item.price.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full max-w-xl rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground mb-6">
+            No saved receipts found on this device.
+          </div>
+        )}
         <div className="flex flex-row gap-5">
           <Login />
           <Signup />

@@ -55,7 +55,7 @@ export default function ProductForm({ initialProduct, hideList = false }: { init
       setFormData({
         name: initialProduct.name || '',
         description: initialProduct.description || '',
-        categoryId: initialProduct.categoryId || '',
+        categoryId: initialProduct.categoryId || initialProduct.category?.id || '',
         price: initialProduct.price || 0,
         costPrice: initialProduct.costPrice || 0,
         images: initialProduct.images || null,
@@ -104,29 +104,44 @@ export default function ProductForm({ initialProduct, hideList = false }: { init
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const pformData = new FormData();
+    const payload: any = {
+      name: formData.name,
+      description: formData.description,
+      categoryId: formData.categoryId,
+      price: parseFloat(String(formData.price)) || 0,
+    };
 
-    if (file) {
-      pformData.append("file", file);
-    }
-
-    pformData.append("name", formData.name);
-    pformData.append("description", formData.description);
-    pformData.append("categoryId", formData.categoryId);
-    pformData.append("price", String(formData.price));
-    if (formData.costPrice) {
-      pformData.append("costPrice", String(formData.costPrice));
+    if (formData.costPrice !== undefined && formData.costPrice !== null && formData.costPrice !== "") {
+      payload.costPrice = parseFloat(String(formData.costPrice)) || 0;
     }
 
     try {
       if (editId) {
-        await axios.put(
-          `/api/dbhandler?model=product&id=${editId}`,
-          pformData
-        );
+        if (file) {
+          const pformData = new FormData();
+          pformData.append("file", file);
+          Object.entries(payload).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              pformData.append(key, String(value));
+            }
+          });
+          await axios.put(`/api/dbhandler?model=product&id=${editId}`, pformData);
+        } else {
+          await axios.put(`/api/dbhandler?model=product&id=${editId}`, payload);
+        }
       } else {
+        const pformData = new FormData();
+        if (file) {
+          pformData.append("file", file);
+        }
+        Object.entries(payload).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            pformData.append(key, String(value));
+          }
+        });
         await axios.post(`/api/product`, pformData);
       }
+
       setUploadStatus("Product saved successfully");
       toast.success(editId ? "Product updated successfully" : "Product created successfully");
       resetForm();
@@ -168,7 +183,7 @@ export default function ProductForm({ initialProduct, hideList = false }: { init
     setFormData({
       name: product.name ?? '',
       description: product.description ?? '',
-      categoryId: product.categoryId ?? '',
+      categoryId: product.categoryId ?? product.category?.id ?? '',
       price: product.price ?? 0,
       costPrice: product.costPrice ?? 0,
       images: product.images ?? [],

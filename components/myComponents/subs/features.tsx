@@ -61,8 +61,8 @@ const Features = () => {
             md:text-lg
           `}
         >
-          We offer the best shopping experience with premium features.
-          We are dedicated to providing a seamless and reliable shopping experience by offering high-quality food products and spice blends that meet strict standards of freshness, hygiene, and authenticity. Our commitment goes beyond just selling products—we carefully source our ingredients, maintain consistent quality control, ensure secure packaging, and deliver promptly to meet the needs of homes and businesses alike. With customer satisfaction at the core of everything we do, we combine competitive pricing, dependable service, and responsive support to build lasting trust and deliver value with every order.
+          We offer the best shopping experience for stylish, quality clothing.
+          Loyz Collection is committed to delivering fashionable apparel with exceptional craftsmanship, premium fabrics, and thoughtful design. Our pieces are carefully curated to help you look your best every day, while our easy shopping experience, dependable shipping, and attentive support make it simple to refresh your wardrobe with confidence. Shop with us for timeless style, trusted quality, and a brand that puts your comfort and elegance first.
         </p>
       </div>
       <div

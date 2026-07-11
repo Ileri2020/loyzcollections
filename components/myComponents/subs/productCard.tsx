@@ -202,7 +202,7 @@ export function ProductCard({
             `
               relative w-full overflow-clip rounded-lg py-0 transition-all
               duration-200 ease-in-out
-              shadow-md m-1 flex md:flex-col
+              shadow-md shadow-accent/30 m-1 flex md:flex-col bg-accent/5
             `,
             orientation === "horizontal" ? "flex-row" : "flex-col",
             isHovered && "ring-1 ring-primary/20"

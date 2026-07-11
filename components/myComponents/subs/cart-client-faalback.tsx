@@ -21,6 +21,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import axios from "axios";
+import { addOrUpdateLocalReceipt, LocalReceipt } from "@/lib/localReceipts";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
@@ -108,6 +109,10 @@ export function CartClient({ className }: CartProps) {
     const deliveryFee = items.length > 0 ? calculateDeliveryFee(selectedAddress) : 0;
     const totalAmount = Number(subtotal || 0) + Number(deliveryFee || 0);
 
+    const saveLocalReceipt = (receipt: LocalReceipt) => {
+        addOrUpdateLocalReceipt(receipt);
+    };
+
     /* CHECKOUT */
     const prepareCheckout = async () => {
         if (!user?.id || !selectedAddressId || items.length === 0) return;
@@ -127,6 +132,29 @@ export function CartClient({ className }: CartProps) {
 
             const res = await axios.post("/api/payment", payload);
             setCheckoutData(res.data);
+
+            saveLocalReceipt({
+                id: res.data.cartId,
+                cartId: res.data.cartId,
+                tx_ref: res.data.tx_ref,
+                createdAt: new Date().toISOString(),
+                status: "pending",
+                total: totalAmount,
+                deliveryFee,
+                items: items.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                })),
+                customerName: user.name || "Customer",
+                contact: user.contact || "",
+                deliveryMethod: "delivery",
+                deliveryAddress: `${selectedAddress?.address || ""}${selectedAddress?.city ? ", " + selectedAddress.city : ""}${selectedAddress?.state ? ", " + selectedAddress.state : ""}`.trim(),
+                receiptUrl: "",
+                linked: user.id !== "nil",
+            });
+
             return res.data; // Return for reuse
         } catch (err) {
             console.error("Checkout initiation failed:", err);

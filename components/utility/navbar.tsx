@@ -16,6 +16,7 @@ import { Cart } from '../myComponents/subs/cart';
 import { SearchInput } from '../myComponents/subs/searchcomponent';
 import { useSession } from "next-auth/react";
 import { useAppContext } from '@/hooks/useAppContext';
+import { getUnlinkedReceiptIds, markLocalReceiptsLinked } from '@/lib/localReceipts';
 import {
   TooltipProvider,
   Tooltip,
@@ -29,12 +30,40 @@ const Navbar = (): JSX.Element => {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status === "authenticated" && user.email === "nil") {
+    if (status === "authenticated" && session?.user?.id) {
       setUser({
         ...session.user,
       });
+
+      const linkLocalReceipts = async () => {
+        const receiptIds = getUnlinkedReceiptIds();
+        if (!receiptIds.length) return;
+
+        try {
+          const response = await fetch("/api/receipts/link", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: session.user.id,
+              receiptIds,
+            }),
+          });
+
+          if (response.ok) {
+            markLocalReceiptsLinked(receiptIds);
+          } else {
+            console.error("Failed to link receipts", await response.text());
+          }
+        } catch (error) {
+          console.error("Failed to link local receipts:", error);
+        }
+      };
+
+      linkLocalReceipts();
     }
-  }, [status, session, user.email, setUser]);
+  }, [status, session?.user?.id, setUser]);
 
   return (
     <TooltipProvider>
@@ -68,8 +97,8 @@ const Navbar = (): JSX.Element => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link href={"/"} className="animate-pulse dark:flex hidden flex-1 md:flex-none h-full max-h-[200px] md:max-h-[50px] /bg-red-500 overflow-clip justify-center items-center">
-                  <Image src={loyzspicesdarklogo} alt="Home" className="h-[100%] w-[35%] md:h-[130%] md:w-[130%]" />
+                <Link href={"/"} className="bg-accent/10 rounded-xl m-3 shadow shadow-accent mx-auto max-w-24 animate-pulse dark:flex hidden flex-1 md:flex-none h-full max-h-[200px] md:max-h-[50px] /bg-red-500 overflow-clip justify-center items-center">
+                  <Image src={loyzspicesdarklogo} alt="Home" className="h-[95%] w-full md:h-[130%] md:w-[130%]" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
