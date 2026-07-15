@@ -95,7 +95,7 @@ export function CartClient({ className }: CartProps) {
   const [guestState, setGuestState] = React.useState("Lagos");
   const [guestCity, setGuestCity] = React.useState("");
   const [guestAddress, setGuestAddress] = React.useState("");
-  const [deliveryMethod, setDeliveryMethod] = React.useState<DeliveryMethod>("delivery");
+  const [deliveryMethod, setDeliveryMethod] = React.useState<DeliveryMethod>("pickup");
 
   const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(
     user?.addresses?.[0]?.id ?? null
@@ -117,13 +117,19 @@ export function CartClient({ className }: CartProps) {
     (a: Address) => a.id === selectedAddressId
   );
 
+  const hasDeliveryLocation =
+    deliveryMethod === "delivery" &&
+    (user?.id !== "nil"
+      ? Boolean(selectedAddressId && (selectedAddress?.address || selectedAddress?.city || selectedAddress?.state))
+      : Boolean(guestAddress.trim() || guestCity.trim() || (guestState.trim() && guestState !== "Lagos")));
+
   const saveLocalReceipt = (receipt: LocalReceipt) => {
     addOrUpdateLocalReceipt(receipt);
   };
 
   React.useEffect(() => {
     const fetchDeliveryFee = async () => {
-      if (deliveryMethod === "pickup") {
+      if (deliveryMethod === "pickup" || !hasDeliveryLocation) {
         setDbDeliveryFee(0);
         setLoadingFee(false);
         return;
@@ -131,6 +137,7 @@ export function CartClient({ className }: CartProps) {
 
       if (!selectedAddress && user?.id !== 'nil') {
         setDbDeliveryFee(0);
+        setLoadingFee(false);
         return;
       }
 
@@ -160,7 +167,8 @@ export function CartClient({ className }: CartProps) {
           !f.state
         );
 
-        setDbDeliveryFee(match ? match.price : 4000); // Default fallback
+        const resolvedFee = match ? match.price : 4000;
+        setDbDeliveryFee(resolvedFee); // Default fallback for unknown states
       } catch (err) {
         console.error("Failed to fetch delivery fee", err);
         setDbDeliveryFee(4000);
@@ -172,7 +180,7 @@ export function CartClient({ className }: CartProps) {
     fetchDeliveryFee();
   }, [selectedAddress, user?.id, guestState, guestCity, deliveryMethod]);
 
-  const deliveryFee = items.length > 0 && deliveryMethod === "delivery" ? dbDeliveryFee : 0;
+  const deliveryFee = items.length > 0 && deliveryMethod === "delivery" && hasDeliveryLocation ? dbDeliveryFee : 0;
   const totalAmount = Number(subtotal || 0) + Number(deliveryFee || 0);
 
   /* CHECKOUT */
@@ -378,7 +386,7 @@ export function CartClient({ className }: CartProps) {
                 size="sm"
                 onClick={() => setDeliveryMethod("delivery")}
               >
-                Delivery
+                Waybill
               </Button>
               <Button
                 type="button"
