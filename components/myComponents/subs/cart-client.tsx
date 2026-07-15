@@ -36,14 +36,14 @@ import { BankTransferForm } from "@/components/payment/BankTransferForm";
 
 /* DELIVERY FEES */
 export const DELIVERY_FEES_BY_STATE: Record<string, number> = {
-  Kwara: 500, Kogi: 5000, Niger: 5000, Oyo: 4000, Osun: 4000,
-  Ogun: 4000, Ondo: 4000, Ekiti: 4000, Benue: 5000, Nasarawa: 3500,
+  Kwara: 2500, Kogi: 4000, Niger: 4000, Oyo: 4000, Osun: 4000,
+  Ogun: 4000, Ondo: 4000, Ekiti: 4000, Benue: 4000, Nasarawa: 4000,
   Lagos: 4000, FCT: 4000, Edo: 4000,
-  Anambra: 6000, Enugu: 5000, Imo: 6000, Abia: 6000, Ebonyi: 6000,
-  Delta: 6000, Rivers: 6000, Akwa_Ibom: 6000, Cross_River: 6000, Bayelsa: 6000,
-  Kaduna: 5000, Kano: 5000, Katsina: 5000, Jigawa: 5000, Zamfara: 5000,
-  Sokoto: 5500, Kebbi: 5500, Bauchi: 5500, Gombe: 5500, Adamawa: 6000,
-  Taraba: 6000, Borno: 6500, Yobe: 6500,
+  Anambra: 4000, Enugu: 4000, Imo: 4000, Abia: 4000, Ebonyi: 4000,
+  Delta: 4000, Rivers: 4000, Akwa_Ibom: 4000, Cross_River: 4000, Bayelsa: 4000,
+  Kaduna: 4000, Kano: 4000, Katsina: 4000, Jigawa: 4000, Zamfara: 4000,
+  Sokoto: 4000, Kebbi: 4000, Bauchi: 4000, Gombe: 4000, Adamawa: 4000,
+  Taraba: 4000, Borno: 4000, Yobe: 4000,
 };
 
 /* TYPES */
@@ -160,10 +160,10 @@ export function CartClient({ className }: CartProps) {
           !f.state
         );
 
-        setDbDeliveryFee(match ? match.price : 6500); // Default fallback
+        setDbDeliveryFee(match ? match.price : 4000); // Default fallback
       } catch (err) {
         console.error("Failed to fetch delivery fee", err);
-        setDbDeliveryFee(6500);
+        setDbDeliveryFee(4000);
       } finally {
         setLoadingFee(false);
       }

@@ -118,7 +118,7 @@ export function CartDetails({ cartId, onPaymentSuccess }: CartDetailsProps) {
     const calculateDeliveryFee = (address?: Address | null): number => {
         const normalizedState = normalizeState(address?.state);
         if (!normalizedState) return 0;
-        return DELIVERY_FEES_BY_STATE[normalizedState] ?? 6500;
+        return DELIVERY_FEES_BY_STATE[normalizedState] ?? 4000;
     };
 
     const selectedAddress = user?.addresses?.find(a => a.id === selectedAddressId);

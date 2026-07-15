@@ -97,49 +97,14 @@ function parseFormValue(key: string, value: string | File) {
 
 
 const DELIVERY_FEES_BY_STATE: Record<string, number> = {
-  Kwara: 1000,
-
-  Kogi: 2500,
-  Niger: 3000,
-  Oyo: 3000,
-  Osun: 3000,
-
-  Ogun: 3500,
-  Ondo: 3500,
-  Ekiti: 3500,
-  Benue: 3500,
-  Nasarawa: 3500,
-
-  Lagos: 4000,
-  FCT: 4000,
-  Edo: 4000,
-
-  Anambra: 4500,
-  Enugu: 4500,
-  Imo: 4500,
-  Abia: 4500,
-  Ebonyi: 4500,
-
-  Delta: 4500,
-  Rivers: 5000,
-  Akwa_Ibom: 5500,
-  Cross_River: 5500,
-  Bayelsa: 5500,
-
-  Kaduna: 4500,
-  Kano: 5000,
-  Katsina: 5000,
-  Jigawa: 5000,
-  Zamfara: 5000,
-  Sokoto: 5500,
-  Kebbi: 5500,
-
-  Bauchi: 5500,
-  Gombe: 5500,
-  Adamawa: 6000,
-  Taraba: 6000,
-  Borno: 6500,
-  Yobe: 6500,
+  Kwara: 2500, Kogi: 4000, Niger: 4000, Oyo: 4000, Osun: 4000,
+  Ogun: 4000, Ondo: 4000, Ekiti: 4000, Benue: 4000, Nasarawa: 4000,
+  Lagos: 4000, FCT: 4000, Edo: 4000,
+  Anambra: 4000, Enugu: 4000, Imo: 4000, Abia: 4000, Ebonyi: 4000,
+  Delta: 4000, Rivers: 4000, Akwa_Ibom: 4000, Cross_River: 4000, Bayelsa: 4000,
+  Kaduna: 4000, Kano: 4000, Katsina: 4000, Jigawa: 4000, Zamfara: 4000,
+  Sokoto: 4000, Kebbi: 4000, Bauchi: 4000, Gombe: 4000, Adamawa: 4000,
+  Taraba: 4000, Borno: 4000, Yobe: 4000,
 };
 
 const normalizeState = (state?: string | null): string | null => {
